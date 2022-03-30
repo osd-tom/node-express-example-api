@@ -1,10 +1,17 @@
 import { Request, Response } from "express"
 import _ from "lodash"
+import bcrypt from "bcrypt"
 import { IUser } from "./../../types/user"
 import User from "../../models/user"
 import { sendResponse } from "../../helpers/commonResponse"
 import { USER_MSG, CODE } from "../../lang/response"
 
+/**
+ * Get user list
+ * 
+ * @param request 
+ * @param response 
+ */
 const getUserList = async (request: Request, response: Response): Promise<void> => {
   try {
     const userList: IUser[] = await User.find()
@@ -14,6 +21,12 @@ const getUserList = async (request: Request, response: Response): Promise<void> 
   }
 }
 
+/**
+ * Get specific user
+ * 
+ * @param request 
+ * @param response 
+ */
 const getUser = async (request: Request, response: Response): Promise<void> => {
   try {
     const { params: { id } } = request
@@ -29,6 +42,12 @@ const getUser = async (request: Request, response: Response): Promise<void> => {
   }
 }
 
+/**
+ * Create new user
+ * 
+ * @param request 
+ * @param response 
+ */
 const createUser = async (request: Request, response: Response): Promise<void> => {
   try {
     const body = request.body as Pick<IUser, "name" | "email" | "phoneNumber" | "dob" | "password">
@@ -37,7 +56,7 @@ const createUser = async (request: Request, response: Response): Promise<void> =
       email: body.email,
       phoneNumber: body.phoneNumber,
       dob: body.dob,
-      password: body.password
+      password: await bcrypt.hash(body.password, 10)
     }
 
     const userItem: IUser = new User(params)
@@ -49,6 +68,12 @@ const createUser = async (request: Request, response: Response): Promise<void> =
   }
 }
 
+/**
+ * Update user
+ * 
+ * @param request 
+ * @param response 
+ */
 const updateUser = async (request: Request, response: Response): Promise<void> => {
   try {
     const {
@@ -69,6 +94,12 @@ const updateUser = async (request: Request, response: Response): Promise<void> =
   }
 }
 
+/**
+ * Delete user
+ * 
+ * @param request 
+ * @param response 
+ */
 const deleteUser = async (request: Request, response: Response): Promise<void> => {
   try {
     const { params: { id } } = request
