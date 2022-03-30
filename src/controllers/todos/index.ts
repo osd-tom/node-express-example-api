@@ -5,6 +5,12 @@ import Todo from "../../models/todo"
 import { sendResponse } from "../../helpers/commonResponse"
 import { TODO_MSG, CODE } from "../../lang/response"
 
+/**
+ * Get todo list
+ * 
+ * @param request 
+ * @param response 
+ */
 const getTodoList = async (request: Request, response: Response): Promise<void> => {
   try {
     const todoList: ITodo[] = await Todo.find()
@@ -14,6 +20,12 @@ const getTodoList = async (request: Request, response: Response): Promise<void> 
   }
 }
 
+/**
+ * Get specific todo item
+ * 
+ * @param request 
+ * @param response 
+ */
 const getTodo = async (request: Request, response: Response): Promise<void> => {
   try {
     const { params: { id } } = request
@@ -29,6 +41,12 @@ const getTodo = async (request: Request, response: Response): Promise<void> => {
   }
 }
 
+/**
+ * Create todo
+ * 
+ * @param request 
+ * @param response 
+ */
 const createTodo = async (request: Request, response: Response): Promise<void> => {
   try {
     const body = request.body as Pick<ITodo, "name" | "description" | "status">
@@ -47,6 +65,12 @@ const createTodo = async (request: Request, response: Response): Promise<void> =
   }
 }
 
+/**
+ * Update todo
+ * 
+ * @param request 
+ * @param response 
+ */
 const updateTodo = async (request: Request, response: Response): Promise<void> => {
   try {
     const {
@@ -67,6 +91,12 @@ const updateTodo = async (request: Request, response: Response): Promise<void> =
   }
 }
 
+/**
+ * Delete todo
+ * 
+ * @param request 
+ * @param response 
+ */
 const deleteTodo = async (request: Request, response: Response): Promise<void> => {
   try {
     const {

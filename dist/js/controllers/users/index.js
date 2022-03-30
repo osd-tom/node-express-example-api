@@ -14,9 +14,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUser = exports.updateUser = exports.createUser = exports.getUser = exports.getUserList = void 0;
 const lodash_1 = __importDefault(require("lodash"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const user_1 = __importDefault(require("../../models/user"));
 const commonResponse_1 = require("../../helpers/commonResponse");
 const response_1 = require("../../lang/response");
+/**
+ * Get user list
+ *
+ * @param request
+ * @param response
+ */
 const getUserList = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userList = yield user_1.default.find();
@@ -27,6 +34,12 @@ const getUserList = (request, response) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 exports.getUserList = getUserList;
+/**
+ * Get specific user
+ *
+ * @param request
+ * @param response
+ */
 const getUser = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { params: { id } } = request;
@@ -43,6 +56,12 @@ const getUser = (request, response) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.getUser = getUser;
+/**
+ * Create new user
+ *
+ * @param request
+ * @param response
+ */
 const createUser = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const body = request.body;
@@ -51,7 +70,7 @@ const createUser = (request, response) => __awaiter(void 0, void 0, void 0, func
             email: body.email,
             phoneNumber: body.phoneNumber,
             dob: body.dob,
-            password: body.password
+            password: yield bcrypt_1.default.hash(body.password, 10)
         };
         const userItem = new user_1.default(params);
         const newUser = yield userItem.save();
@@ -63,6 +82,12 @@ const createUser = (request, response) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.createUser = createUser;
+/**
+ * Update user
+ *
+ * @param request
+ * @param response
+ */
 const updateUser = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { params: { id }, body } = request;
@@ -81,6 +106,12 @@ const updateUser = (request, response) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.updateUser = updateUser;
+/**
+ * Delete user
+ *
+ * @param request
+ * @param response
+ */
 const deleteUser = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { params: { id } } = request;

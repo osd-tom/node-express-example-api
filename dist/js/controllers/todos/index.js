@@ -17,6 +17,12 @@ const lodash_1 = __importDefault(require("lodash"));
 const todo_1 = __importDefault(require("../../models/todo"));
 const commonResponse_1 = require("../../helpers/commonResponse");
 const response_1 = require("../../lang/response");
+/**
+ * Get todo list
+ *
+ * @param request
+ * @param response
+ */
 const getTodoList = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const todoList = yield todo_1.default.find();
@@ -27,6 +33,12 @@ const getTodoList = (request, response) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 exports.getTodoList = getTodoList;
+/**
+ * Get specific todo item
+ *
+ * @param request
+ * @param response
+ */
 const getTodo = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { params: { id } } = request;
@@ -43,6 +55,12 @@ const getTodo = (request, response) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.getTodo = getTodo;
+/**
+ * Create todo
+ *
+ * @param request
+ * @param response
+ */
 const createTodo = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const body = request.body;
@@ -61,6 +79,12 @@ const createTodo = (request, response) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.createTodo = createTodo;
+/**
+ * Update todo
+ *
+ * @param request
+ * @param response
+ */
 const updateTodo = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { params: { id }, body } = request;
@@ -79,6 +103,12 @@ const updateTodo = (request, response) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.updateTodo = updateTodo;
+/**
+ * Delete todo
+ *
+ * @param request
+ * @param response
+ */
 const deleteTodo = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { params: { id } } = request;
