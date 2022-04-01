@@ -15,9 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUser = exports.updateUser = exports.createUser = exports.getUser = exports.getUserList = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const user_1 = __importDefault(require("../../models/user"));
 const commonResponse_1 = require("../../helpers/commonResponse");
 const response_1 = require("../../lang/response");
+const user_1 = require("../../services/user");
+const auth_1 = require("../../constants/auth/auth");
 /**
  * Get user list
  *
@@ -26,7 +27,7 @@ const response_1 = require("../../lang/response");
  */
 const getUserList = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userList = yield user_1.default.find();
+        const userList = yield (0, user_1.findAllUser)(["-password"]);
         (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.USER_MSG.LISTS.GET_SUCCESS, { userList });
     }
     catch (error) {
@@ -35,7 +36,7 @@ const getUserList = (request, response) => __awaiter(void 0, void 0, void 0, fun
 });
 exports.getUserList = getUserList;
 /**
- * Get specific user
+ * Get specific user data
  *
  * @param request
  * @param response
@@ -43,13 +44,11 @@ exports.getUserList = getUserList;
 const getUser = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { params: { id } } = request;
-        const user = yield user_1.default.findById(id);
+        const user = yield (0, user_1.findUserBy)([{ _id: id }], ["-password"]);
         if (lodash_1.default.isEmpty(user)) {
-            (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.USER_MSG.USER.USER_NOT_FOUND, {});
+            (0, commonResponse_1.sendResponse)(response, response_1.CODE.FAILURE, response_1.USER_MSG.USER.USER_NOT_FOUND, {});
         }
-        else {
-            (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.USER_MSG.USER.GET_USER_SUCCESS, { user });
-        }
+        (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.USER_MSG.USER.GET_USER_SUCCESS, { user });
     }
     catch (error) {
         (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.USER_MSG.USER.GET_USER_FAILURE, {});
@@ -70,12 +69,14 @@ const createUser = (request, response) => __awaiter(void 0, void 0, void 0, func
             email: body.email,
             phoneNumber: body.phoneNumber,
             dob: body.dob,
-            password: yield bcrypt_1.default.hash(body.password, 10)
+            password: yield bcrypt_1.default.hash(body.password, auth_1.SALT)
         };
-        const userItem = new user_1.default(params);
-        const newUser = yield userItem.save();
-        const userList = yield user_1.default.find();
-        (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.USER_MSG.USER.CREATE_SUCCESS, { newUser, userList });
+        const newUser = yield (0, user_1.createAndSaveUser)(params);
+        const userList = yield (0, user_1.findAllUser)(["-password"]);
+        (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.USER_MSG.USER.CREATE_SUCCESS, {
+            newUser,
+            userList
+        });
     }
     catch (error) {
         (0, commonResponse_1.sendResponse)(response, response_1.CODE.FAILURE, response_1.USER_MSG.USER.CREATE_FAILURE, {});
@@ -91,15 +92,11 @@ exports.createUser = createUser;
 const updateUser = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { params: { id }, body } = request;
-        const user = yield user_1.default.findById(id);
-        if (lodash_1.default.isEmpty(user)) {
+        if (!(yield (0, user_1.checkIsExistedUser)(id))) {
             (0, commonResponse_1.sendResponse)(response, response_1.CODE.FAILURE, response_1.USER_MSG.USER.USER_NOT_FOUND, {});
         }
-        else {
-            yield user_1.default.findByIdAndUpdate({ _id: id }, body);
-            const userList = yield user_1.default.find();
-            (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.USER_MSG.USER.UPDATE_SUCCESS, { userList });
-        }
+        const user = yield (0, user_1.updateAndSaveUser)(id, body);
+        (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.USER_MSG.USER.UPDATE_SUCCESS, { user });
     }
     catch (error) {
         (0, commonResponse_1.sendResponse)(response, response_1.CODE.FAILURE, response_1.USER_MSG.USER.UPDATE_FAILURE, {});
@@ -115,15 +112,12 @@ exports.updateUser = updateUser;
 const deleteUser = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { params: { id } } = request;
-        const user = yield user_1.default.findById(id);
-        if (lodash_1.default.isEmpty(user)) {
+        if (!(yield (0, user_1.checkIsExistedUser)(id))) {
             (0, commonResponse_1.sendResponse)(response, response_1.CODE.FAILURE, response_1.USER_MSG.USER.USER_NOT_FOUND, {});
         }
-        else {
-            yield user_1.default.findByIdAndRemove({ _id: id });
-            const userList = yield user_1.default.find();
-            (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.USER_MSG.USER.DELETE_SUCCESS, { userList });
-        }
+        yield (0, user_1.deleteUserById)(id);
+        const userList = yield (0, user_1.findAllUser)(["-password"]);
+        (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.USER_MSG.USER.DELETE_SUCCESS, { userList });
     }
     catch (error) {
         (0, commonResponse_1.sendResponse)(response, response_1.CODE.FAILURE, response_1.USER_MSG.USER.DELETE_FAILURE, {});

@@ -4,6 +4,14 @@ import { ITodo } from "./../../types/todo"
 import Todo from "../../models/todo"
 import { sendResponse } from "../../helpers/commonResponse"
 import { TODO_MSG, CODE } from "../../lang/response"
+import { 
+  checkIsExistedTodo,
+  createAndSaveTodo,
+  deleteTodoById,
+  findAllTodo,
+  findTodoBy,
+  updateAndSaveTodo
+} from "../../services/todo"
 
 /**
  * Get todo list
@@ -13,10 +21,20 @@ import { TODO_MSG, CODE } from "../../lang/response"
  */
 const getTodoList = async (request: Request, response: Response): Promise<void> => {
   try {
-    const todoList: ITodo[] = await Todo.find()
-    sendResponse(response, CODE.SUCCESS, TODO_MSG.LISTS.GET_SUCCESS, { todoList })
+    const todoList: ITodo[] = await findAllTodo([])
+    sendResponse(
+      response,
+      CODE.SUCCESS,
+      TODO_MSG.LISTS.GET_SUCCESS,
+      { todoList }
+    )
   } catch (error) {
-    sendResponse(response, CODE.FAILURE, TODO_MSG.LISTS.GET_FAILURE, {})
+    sendResponse(
+      response,
+      CODE.FAILURE,
+      TODO_MSG.LISTS.GET_FAILURE,
+      {}
+    )
   }
 }
 
@@ -30,14 +48,29 @@ const getTodo = async (request: Request, response: Response): Promise<void> => {
   try {
     const { params: { id } } = request
     
-    const todo: ITodo | null = await Todo.findById(id)
+    const todo: ITodo | null = await findTodoBy([{_id: id}], [])
     if (_.isEmpty(todo)) {
-      sendResponse(response, CODE.FAILURE, TODO_MSG.TODO.ITEM_NOT_FOUND, {})
-    } else {
-      sendResponse(response, CODE.SUCCESS, TODO_MSG.TODO.GET_TODO_SUCCESS, { todo })
+      sendResponse(
+        response,
+        CODE.FAILURE,
+        TODO_MSG.TODO.ITEM_NOT_FOUND,
+        {}
+      )
     }
+
+    sendResponse(
+      response,
+      CODE.SUCCESS,
+      TODO_MSG.TODO.GET_TODO_SUCCESS,
+      { todo }
+    )
   } catch (error) {
-    sendResponse(response, CODE.FAILURE, TODO_MSG.TODO.GET_TODO_FAILURE, {})
+    sendResponse(
+      response,
+      CODE.FAILURE,
+      TODO_MSG.TODO.GET_TODO_FAILURE,
+      {}
+    )
   }
 }
 
@@ -56,12 +89,21 @@ const createTodo = async (request: Request, response: Response): Promise<void> =
       status: body.status
     }
 
-    const todoItem: ITodo = new Todo(params)
-    const newTodo: ITodo = await todoItem.save()
+    const newTodo: ITodo = await createAndSaveTodo(params)
     const todoList: ITodo[] = await Todo.find()
-    sendResponse(response, CODE.SUCCESS, TODO_MSG.TODO.CREATE_SUCCESS, { newTodo, todoList })
+    sendResponse(
+      response,
+      CODE.SUCCESS,
+      TODO_MSG.TODO.CREATE_SUCCESS,
+      { newTodo, todoList }
+    )
   } catch (error) {
-    sendResponse(response, CODE.FAILURE, TODO_MSG.TODO.CREATE_FAILURE, {})
+    sendResponse(
+      response,
+      CODE.FAILURE,
+      TODO_MSG.TODO.CREATE_FAILURE,
+      {}
+    )
   }
 }
 
@@ -78,16 +120,29 @@ const updateTodo = async (request: Request, response: Response): Promise<void> =
       body
     } = request
 
-    const todo: ITodo | null = await Todo.findById(id)
-    if (_.isEmpty(todo)) {
-      sendResponse(response, CODE.FAILURE, TODO_MSG.TODO.ITEM_NOT_FOUND, {})
-    } else {
-      await Todo.findByIdAndUpdate({ _id: id }, body)
-      const todoList: ITodo[] = await Todo.find()
-      sendResponse(response, CODE.SUCCESS, TODO_MSG.TODO.UPDATE_SUCCESS, { todoList })
+    if (!await checkIsExistedTodo(id)) {
+      sendResponse(
+        response,
+        CODE.FAILURE,
+        TODO_MSG.TODO.ITEM_NOT_FOUND,
+        {}
+      )
     }
+
+    const todo = await updateAndSaveTodo(id, body)
+    sendResponse(
+      response,
+      CODE.SUCCESS,
+      TODO_MSG.TODO.UPDATE_SUCCESS,
+      { todo }
+    )
   } catch (error) {
-    sendResponse(response, CODE.FAILURE, TODO_MSG.TODO.UPDATE_FAILURE, {})
+    sendResponse(
+      response,
+      CODE.FAILURE,
+      TODO_MSG.TODO.UPDATE_FAILURE,
+      {}
+    )
   }
 }
 
@@ -103,17 +158,37 @@ const deleteTodo = async (request: Request, response: Response): Promise<void> =
       params: { id }
     } = request
 
-    const todo: ITodo | null = await Todo.findById(id)
-    if (_.isEmpty(todo)) {
-      sendResponse(response, CODE.FAILURE, TODO_MSG.TODO.ITEM_NOT_FOUND, {})
-    } else {
-      await Todo.findByIdAndRemove(id)
-      const todoList: ITodo[] = await Todo.find()
-      sendResponse(response, CODE.SUCCESS, TODO_MSG.TODO.DELETE_SUCCESS, { todoList })
+    if (!await checkIsExistedTodo(id)) {
+      sendResponse(
+        response,
+        CODE.FAILURE,
+        TODO_MSG.TODO.ITEM_NOT_FOUND,
+        {}
+      )
     }
+
+    await deleteTodoById(id)
+    const todoList: ITodo[] = await Todo.find()
+    sendResponse(
+      response,
+      CODE.SUCCESS,
+      TODO_MSG.TODO.DELETE_SUCCESS,
+      { todoList }
+    )
   } catch (error) {
-    sendResponse(response, CODE.FAILURE, TODO_MSG.TODO.DELETE_FAILURE, {})
+    sendResponse(
+      response,
+      CODE.FAILURE,
+      TODO_MSG.TODO.DELETE_FAILURE,
+      {}
+    )
   }
 }
 
-export { getTodoList, getTodo, createTodo, updateTodo, deleteTodo }
+export { 
+  getTodoList,
+  getTodo,
+  createTodo,
+  updateTodo,
+  deleteTodo
+}

@@ -36,5 +36,6 @@ export const USER_MSG = {
 
 export const CODE = {
   SUCCESS: 200,
-  FAILURE: 404
+  FAILURE: 404,
+  VALIDATE: 400,
 }

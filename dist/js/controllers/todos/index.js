@@ -17,6 +17,7 @@ const lodash_1 = __importDefault(require("lodash"));
 const todo_1 = __importDefault(require("../../models/todo"));
 const commonResponse_1 = require("../../helpers/commonResponse");
 const response_1 = require("../../lang/response");
+const todo_2 = require("../../services/todo");
 /**
  * Get todo list
  *
@@ -25,7 +26,7 @@ const response_1 = require("../../lang/response");
  */
 const getTodoList = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const todoList = yield todo_1.default.find();
+        const todoList = yield (0, todo_2.findAllTodo)([]);
         (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.TODO_MSG.LISTS.GET_SUCCESS, { todoList });
     }
     catch (error) {
@@ -42,13 +43,11 @@ exports.getTodoList = getTodoList;
 const getTodo = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { params: { id } } = request;
-        const todo = yield todo_1.default.findById(id);
+        const todo = yield (0, todo_2.findTodoBy)([{ _id: id }], []);
         if (lodash_1.default.isEmpty(todo)) {
             (0, commonResponse_1.sendResponse)(response, response_1.CODE.FAILURE, response_1.TODO_MSG.TODO.ITEM_NOT_FOUND, {});
         }
-        else {
-            (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.TODO_MSG.TODO.GET_TODO_SUCCESS, { todo });
-        }
+        (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.TODO_MSG.TODO.GET_TODO_SUCCESS, { todo });
     }
     catch (error) {
         (0, commonResponse_1.sendResponse)(response, response_1.CODE.FAILURE, response_1.TODO_MSG.TODO.GET_TODO_FAILURE, {});
@@ -69,8 +68,7 @@ const createTodo = (request, response) => __awaiter(void 0, void 0, void 0, func
             description: body.description,
             status: body.status
         };
-        const todoItem = new todo_1.default(params);
-        const newTodo = yield todoItem.save();
+        const newTodo = yield (0, todo_2.createAndSaveTodo)(params);
         const todoList = yield todo_1.default.find();
         (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.TODO_MSG.TODO.CREATE_SUCCESS, { newTodo, todoList });
     }
@@ -88,15 +86,11 @@ exports.createTodo = createTodo;
 const updateTodo = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { params: { id }, body } = request;
-        const todo = yield todo_1.default.findById(id);
-        if (lodash_1.default.isEmpty(todo)) {
+        if (!(yield (0, todo_2.checkIsExistedTodo)(id))) {
             (0, commonResponse_1.sendResponse)(response, response_1.CODE.FAILURE, response_1.TODO_MSG.TODO.ITEM_NOT_FOUND, {});
         }
-        else {
-            yield todo_1.default.findByIdAndUpdate({ _id: id }, body);
-            const todoList = yield todo_1.default.find();
-            (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.TODO_MSG.TODO.UPDATE_SUCCESS, { todoList });
-        }
+        const todo = yield (0, todo_2.updateAndSaveTodo)(id, body);
+        (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.TODO_MSG.TODO.UPDATE_SUCCESS, { todo });
     }
     catch (error) {
         (0, commonResponse_1.sendResponse)(response, response_1.CODE.FAILURE, response_1.TODO_MSG.TODO.UPDATE_FAILURE, {});
@@ -112,15 +106,12 @@ exports.updateTodo = updateTodo;
 const deleteTodo = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { params: { id } } = request;
-        const todo = yield todo_1.default.findById(id);
-        if (lodash_1.default.isEmpty(todo)) {
+        if (!(yield (0, todo_2.checkIsExistedTodo)(id))) {
             (0, commonResponse_1.sendResponse)(response, response_1.CODE.FAILURE, response_1.TODO_MSG.TODO.ITEM_NOT_FOUND, {});
         }
-        else {
-            yield todo_1.default.findByIdAndRemove(id);
-            const todoList = yield todo_1.default.find();
-            (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.TODO_MSG.TODO.DELETE_SUCCESS, { todoList });
-        }
+        yield (0, todo_2.deleteTodoById)(id);
+        const todoList = yield todo_1.default.find();
+        (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.TODO_MSG.TODO.DELETE_SUCCESS, { todoList });
     }
     catch (error) {
         (0, commonResponse_1.sendResponse)(response, response_1.CODE.FAILURE, response_1.TODO_MSG.TODO.DELETE_FAILURE, {});

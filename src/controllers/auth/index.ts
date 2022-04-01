@@ -5,7 +5,8 @@ import { IUser } from "../../types/user"
 import User from "../../models/user"
 import { sendResponse } from "../../helpers/commonResponse"
 import { CODE, USER_MSG } from "../../lang/response"
-import { createToken } from "../../utils/generateToken"
+import { generateToken } from "../../utils/token"
+import { ITokenPayload } from "../../types/tokenPayload"
 
 /**
  * Register
@@ -32,7 +33,14 @@ const registration = async (request: Request, response: Response): Promise<void>
       const user: IUser = await registeringUser.save()
       await user.save()
       user.password = ""
-      const token = createToken(user)
+      const payload: ITokenPayload = {
+        exp: 60 * 60,
+        accessTypes: [],
+        name: user.name,
+        userId: user._id
+      }
+      const token = generateToken(payload)
+      
       sendResponse(response, CODE.SUCCESS, USER_MSG.USER.CREATE_SUCCESS, { token, user })
     }
   } catch (error) {
