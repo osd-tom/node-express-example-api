@@ -23,17 +23,26 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.generateToken = void 0;
 const jwt = __importStar(require("jsonwebtoken"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+/**
+ * Token variables
+ */
 const ALOGRITHM = 'RS256';
-const EXPIRES_IN = 60 * 60;
-const PRIVATE_KEY_PATH = './../private.key';
+const PRIVATE_KEY_PATH = './../../../private.key';
+/**
+ * Generate token
+ *
+ * @param payload
+ * @returns
+ */
 const generateToken = (payload) => {
     const privateKey = fs.readFileSync(path.join(__dirname, PRIVATE_KEY_PATH));
     const signInOptions = {
-        algorithm: ALOGRITHM,
-        expiresIn: EXPIRES_IN
+        algorithm: ALOGRITHM
     };
-    return jwt.sign(payload, privateKey, signInOptions);
+    return jwt.sign(payload, { key: privateKey, passphrase: process.env.JWT_PASSPHRASE }, signInOptions);
 };
+exports.generateToken = generateToken;

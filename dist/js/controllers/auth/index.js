@@ -17,7 +17,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const user_1 = __importDefault(require("../../models/user"));
 const commonResponse_1 = require("../../helpers/commonResponse");
 const response_1 = require("../../lang/response");
-const generateToken_1 = require("../../utils/generateToken");
+const token_1 = require("../../utils/token");
 /**
  * Register
  *
@@ -43,7 +43,13 @@ const registration = (request, response) => __awaiter(void 0, void 0, void 0, fu
             const user = yield registeringUser.save();
             yield user.save();
             user.password = "";
-            const token = (0, generateToken_1.createToken)(user);
+            const payload = {
+                exp: 60 * 60,
+                accessTypes: [],
+                name: user.name,
+                userId: user._id
+            };
+            const token = (0, token_1.generateToken)(payload);
             (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.USER_MSG.USER.CREATE_SUCCESS, { token, user });
         }
     }
