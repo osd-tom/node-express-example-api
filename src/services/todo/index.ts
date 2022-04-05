@@ -1,4 +1,5 @@
 import _ from "lodash"
+import { EXCEPTION } from "../../lang/error"
 import Todo from "../../models/todo"
 import { ITodo } from "../../types/todo"
 
@@ -16,7 +17,7 @@ const findAllTodo = async (queryOptions: any | []) => {
 
     return await Todo.find().select(queryOptions)
   } catch (error) {
-    throw new Error(`Unable to connect to the database`)
+    throw new Error(EXCEPTION.SYSTEM.DB_CONNECTION)
   }
 }
 
@@ -39,7 +40,7 @@ const findTodoBy = async (queryParams: any | [], queryOptions: any | []) => {
 
     return await query.select(queryOptions)
   } catch (error) {
-    throw new Error(`Unable to find todo with parameters: ${queryParams}`)
+    throw new Error(`${EXCEPTION.TODO.FIND_WITH_PARAMS}: ${queryParams}`)
   }
 }
 
@@ -55,7 +56,7 @@ const createAndSaveTodo = async (parameters: any) => {
     const newTodo: ITodo = await todoItem.save()
     return newTodo
   } catch (error) {
-    throw new Error(`Unable to connect to the database`)
+    throw new Error(EXCEPTION.SYSTEM.DB_CONNECTION)
   }
 }
 
@@ -74,7 +75,7 @@ const checkIsExistedTodo = async (todoId: string | number) => {
     }
     return true
   } catch (error) {
-    throw new Error(`Unable to find todo with id: ${todoId}`)
+    throw new Error(`${EXCEPTION.TODO.FIND_WITH_ID}: ${todoId}`)
   }
 }
 
@@ -90,7 +91,7 @@ const updateAndSaveTodo = async (todoId: string | number, parameters: object) =>
     await Todo.findByIdAndUpdate({ _id: todoId }, parameters)
     return await findTodoBy([{_id: todoId}], [])
   } catch (error) {
-    throw new Error(`Unable to update todo with id: ${todoId}`)
+    throw new Error(`${EXCEPTION.TODO.UPDATE_WITH_ID}: ${todoId}`)
   }
 }
 
@@ -103,7 +104,7 @@ const deleteTodoById = async (todoId: string | number) => {
   try {
     await Todo.findByIdAndRemove(todoId)
   } catch (error) {
-    throw new Error(`Unable to remove the todo with id: ${todoId}`)
+    throw new Error(`${EXCEPTION.TODO.REMOVE_WITH_ID}: ${todoId}`)
   }
 }
 
