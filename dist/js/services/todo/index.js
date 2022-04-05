@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteTodoById = exports.updateAndSaveTodo = exports.checkIsExistedTodo = exports.createAndSaveTodo = exports.findTodoBy = exports.findAllTodo = void 0;
 const lodash_1 = __importDefault(require("lodash"));
+const error_1 = require("../../lang/error");
 const todo_1 = __importDefault(require("../../models/todo"));
 /**
  * Get todo list
@@ -29,7 +30,7 @@ const findAllTodo = (queryOptions) => __awaiter(void 0, void 0, void 0, function
         return yield todo_1.default.find().select(queryOptions);
     }
     catch (error) {
-        throw new Error(`Unable to connect to the database`);
+        throw new Error(error_1.EXCEPTION.SYSTEM.DB_CONNECTION);
     }
 });
 exports.findAllTodo = findAllTodo;
@@ -51,7 +52,7 @@ const findTodoBy = (queryParams, queryOptions) => __awaiter(void 0, void 0, void
         return yield query.select(queryOptions);
     }
     catch (error) {
-        throw new Error(`Unable to find todo with parameters: ${queryParams}`);
+        throw new Error(`${error_1.EXCEPTION.TODO.FIND_WITH_PARAMS}: ${queryParams}`);
     }
 });
 exports.findTodoBy = findTodoBy;
@@ -68,7 +69,7 @@ const createAndSaveTodo = (parameters) => __awaiter(void 0, void 0, void 0, func
         return newTodo;
     }
     catch (error) {
-        throw new Error(`Unable to connect to the database`);
+        throw new Error(error_1.EXCEPTION.SYSTEM.DB_CONNECTION);
     }
 });
 exports.createAndSaveTodo = createAndSaveTodo;
@@ -87,7 +88,7 @@ const checkIsExistedTodo = (todoId) => __awaiter(void 0, void 0, void 0, functio
         return true;
     }
     catch (error) {
-        throw new Error(`Unable to find todo with id: ${todoId}`);
+        throw new Error(`${error_1.EXCEPTION.TODO.FIND_WITH_ID}: ${todoId}`);
     }
 });
 exports.checkIsExistedTodo = checkIsExistedTodo;
@@ -104,7 +105,7 @@ const updateAndSaveTodo = (todoId, parameters) => __awaiter(void 0, void 0, void
         return yield findTodoBy([{ _id: todoId }], []);
     }
     catch (error) {
-        throw new Error(`Unable to update todo with id: ${todoId}`);
+        throw new Error(`${error_1.EXCEPTION.TODO.UPDATE_WITH_ID}: ${todoId}`);
     }
 });
 exports.updateAndSaveTodo = updateAndSaveTodo;
@@ -118,7 +119,7 @@ const deleteTodoById = (todoId) => __awaiter(void 0, void 0, void 0, function* (
         yield todo_1.default.findByIdAndRemove(todoId);
     }
     catch (error) {
-        throw new Error(`Unable to remove the todo with id: ${todoId}`);
+        throw new Error(`${error_1.EXCEPTION.TODO.REMOVE_WITH_ID}: ${todoId}`);
     }
 });
 exports.deleteTodoById = deleteTodoById;

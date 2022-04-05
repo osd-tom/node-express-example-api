@@ -1,4 +1,5 @@
 import _ from "lodash"
+import { EXCEPTION } from "../../lang/error"
 import User from "../../models/user"
 import { IUser } from "../../types/user"
 
@@ -16,7 +17,7 @@ const findAllUser = async (queryOptions: any | []) => {
 
     return await User.find().select(queryOptions)
   } catch (error) {
-    throw new Error(`Unable to connect to the database`)
+    throw new Error(EXCEPTION.SYSTEM.DB_CONNECTION)
   }
 }
 
@@ -39,7 +40,7 @@ const findUserBy = async (queryParams: any, queryOptions: any) => {
 
     return await query.select(queryOptions)
   } catch (error) {
-    throw new Error(`Unable to find user with parameters: ${queryParams}`)
+    throw new Error(`${EXCEPTION.USER.FIND_WITH_PARAMS}: ${queryParams}`)
   }
 }
 
@@ -58,7 +59,7 @@ const checkIsExistedUser = async (userId: string | number) => {
     }
     return true
   } catch (error) {
-    throw new Error(`Unable to find user with id: ${userId}`)
+    throw new Error(`${EXCEPTION.USER.FIND_WITH_ID}: ${userId}`)
   }
 }
 
@@ -74,7 +75,7 @@ const createAndSaveUser = async (params: object) => {
     const newUser: IUser = await userItem.save()
     return newUser
   } catch (error) {
-    throw new Error(`Unable to connect to the database`)
+    throw new Error(EXCEPTION.SYSTEM.DB_CONNECTION)
   }
 }
 
@@ -91,7 +92,7 @@ const updateAndSaveUser = async (userId: string | number, params: object) => {
     const user = await findUserBy([{_id: userId}], ["-password"])
     return user
   } catch (error) {
-    throw new Error(`Unable to update user with id: ${userId}`)
+    throw new Error(`${EXCEPTION.USER.UPDATE_WITH_ID}: ${userId}`)
   }
 }
 
@@ -104,7 +105,7 @@ const deleteUserById = async (userId: string | number) => {
   try {
     await User.findByIdAndRemove(userId)
   } catch (error) {
-    throw new Error(`Unable to remove user with id: ${userId}`)
+    throw new Error(`${EXCEPTION.USER.REMOVE_WITH_ID}: ${userId}`)
   }
 }
 

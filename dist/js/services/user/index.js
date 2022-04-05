@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUserById = exports.updateAndSaveUser = exports.createAndSaveUser = exports.checkIsExistedUser = exports.findUserBy = exports.findAllUser = void 0;
 const lodash_1 = __importDefault(require("lodash"));
+const error_1 = require("../../lang/error");
 const user_1 = __importDefault(require("../../models/user"));
 /**
  * Get user base on query options
@@ -29,7 +30,7 @@ const findAllUser = (queryOptions) => __awaiter(void 0, void 0, void 0, function
         return yield user_1.default.find().select(queryOptions);
     }
     catch (error) {
-        throw new Error(`Unable to connect to the database`);
+        throw new Error(error_1.EXCEPTION.SYSTEM.DB_CONNECTION);
     }
 });
 exports.findAllUser = findAllUser;
@@ -51,7 +52,7 @@ const findUserBy = (queryParams, queryOptions) => __awaiter(void 0, void 0, void
         return yield query.select(queryOptions);
     }
     catch (error) {
-        throw new Error(`Unable to find user with parameters: ${queryParams}`);
+        throw new Error(`${error_1.EXCEPTION.USER.FIND_WITH_PARAMS}: ${queryParams}`);
     }
 });
 exports.findUserBy = findUserBy;
@@ -70,7 +71,7 @@ const checkIsExistedUser = (userId) => __awaiter(void 0, void 0, void 0, functio
         return true;
     }
     catch (error) {
-        throw new Error(`Unable to find user with id: ${userId}`);
+        throw new Error(`${error_1.EXCEPTION.USER.FIND_WITH_ID}: ${userId}`);
     }
 });
 exports.checkIsExistedUser = checkIsExistedUser;
@@ -87,7 +88,7 @@ const createAndSaveUser = (params) => __awaiter(void 0, void 0, void 0, function
         return newUser;
     }
     catch (error) {
-        throw new Error(`Unable to connect to the database`);
+        throw new Error(error_1.EXCEPTION.SYSTEM.DB_CONNECTION);
     }
 });
 exports.createAndSaveUser = createAndSaveUser;
@@ -105,7 +106,7 @@ const updateAndSaveUser = (userId, params) => __awaiter(void 0, void 0, void 0, 
         return user;
     }
     catch (error) {
-        throw new Error(`Unable to update user with id: ${userId}`);
+        throw new Error(`${error_1.EXCEPTION.USER.UPDATE_WITH_ID}: ${userId}`);
     }
 });
 exports.updateAndSaveUser = updateAndSaveUser;
@@ -119,7 +120,7 @@ const deleteUserById = (userId) => __awaiter(void 0, void 0, void 0, function* (
         yield user_1.default.findByIdAndRemove(userId);
     }
     catch (error) {
-        throw new Error(`Unable to remove user with id: ${userId}`);
+        throw new Error(`${error_1.EXCEPTION.USER.REMOVE_WITH_ID}: ${userId}`);
     }
 });
 exports.deleteUserById = deleteUserById;
