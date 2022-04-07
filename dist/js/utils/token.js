@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateToken = void 0;
+exports.verifyToken = exports.generateToken = void 0;
 const jwt = __importStar(require("jsonwebtoken"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
@@ -32,6 +32,7 @@ const path = __importStar(require("path"));
  */
 const ALOGRITHM = 'RS256';
 const PRIVATE_KEY_PATH = './../../../private.key';
+const PRIVATE_KEY = fs.readFileSync(path.join(__dirname, PRIVATE_KEY_PATH));
 /**
  * Generate token
  *
@@ -39,10 +40,23 @@ const PRIVATE_KEY_PATH = './../../../private.key';
  * @returns
  */
 const generateToken = (payload) => {
-    const privateKey = fs.readFileSync(path.join(__dirname, PRIVATE_KEY_PATH));
     const signInOptions = {
         algorithm: ALOGRITHM
     };
-    return jwt.sign(payload, { key: privateKey, passphrase: process.env.JWT_PASSPHRASE }, signInOptions);
+    return jwt.sign(payload, { key: PRIVATE_KEY, passphrase: process.env.JWT_PASSPHRASE }, signInOptions);
 };
 exports.generateToken = generateToken;
+/**
+ * Verfify user's token
+ *
+ * @param token
+ */
+const verifyToken = (token) => {
+    try {
+        // [TODO_2022/04/07]
+    }
+    catch (error) {
+        throw new Error("");
+    }
+};
+exports.verifyToken = verifyToken;

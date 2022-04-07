@@ -50,7 +50,10 @@ const registration = (request, response) => __awaiter(void 0, void 0, void 0, fu
                 userId: user._id
             };
             const token = (0, token_1.generateToken)(payload);
-            (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.USER_MSG.USER.CREATE_SUCCESS, { token, user });
+            (0, commonResponse_1.sendResponse)(response, response_1.CODE.SUCCESS, response_1.USER_MSG.USER.CREATE_SUCCESS, {
+                token,
+                user
+            });
         }
     }
     catch (error) {

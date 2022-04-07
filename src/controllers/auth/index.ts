@@ -5,7 +5,7 @@ import { IUser } from "../../types/user"
 import User from "../../models/user"
 import { sendResponse } from "../../helpers/commonResponse"
 import { CODE, USER_MSG } from "../../lang/response"
-import { generateToken } from "../../utils/token"
+import { generateToken, verifyToken } from "../../utils/token"
 import { ITokenPayload } from "../../types/tokenPayload"
 
 /**
@@ -27,7 +27,12 @@ const registration = async (request: Request, response: Response): Promise<void>
 
     const userEmail: IUser | null = await User.findOne({ email: body.email })
     if (userEmail) {
-      sendResponse(response, CODE.FAILURE, "Email has already been taken", {})
+      sendResponse(
+        response,
+        CODE.FAILURE,
+        "Email has already been taken",
+        {}
+      )
     } else {
       const registeringUser: IUser = new User(params)
       const user: IUser = await registeringUser.save()
@@ -40,8 +45,15 @@ const registration = async (request: Request, response: Response): Promise<void>
         userId: user._id
       }
       const token = generateToken(payload)
-      
-      sendResponse(response, CODE.SUCCESS, USER_MSG.USER.CREATE_SUCCESS, { token, user })
+      sendResponse(
+        response,
+        CODE.SUCCESS,
+        USER_MSG.USER.CREATE_SUCCESS,
+        { 
+          token,
+          user
+        }
+      )
     }
   } catch (error) {
     throw error
